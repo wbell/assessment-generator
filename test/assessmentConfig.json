@@ -1,0 +1,7 @@
+{
+	"AssessmentName": "Test Assessment",
+	"AssessmentDescription": "This is just a simple test assessment.",
+	"MaxQuestions": 10,
+	"PassingScore": 7,
+	"Randomize": true
+}

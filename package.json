@@ -1,0 +1,22 @@
+{
+  "name": "assessment-generator",
+  "version": "0.0.0",
+  "description": "Generate CPE style assesment tests",
+  "main": "index.js",
+  "scripts": {
+    "test": "gulp test"
+  },
+  "keywords": [
+    "assessment",
+    "test",
+    "generator",
+    "CPE"
+  ],
+  "author": "Willie Bell",
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {
+    "lodash": "^3.6.0",
+    "xlsx": "^0.7.12"
+  }
+}
