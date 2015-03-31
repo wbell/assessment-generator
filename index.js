@@ -1,24 +1,46 @@
 var xlsx = require('xlsx');
 var util = require('util');
 var _ = require('lodash');
+var defaults = require('./defaults');
 
-function AssessmentGenerator(opts){
+function AssessmentGenerator(userOpts){
+	userOpts = _.isPlainObject(userOpts) ? userOpts : {};
+	var opts = _.assign(defaults, userOpts);
 
-	var file = xlsx.readFile('./test/questions.xlsx');
-
-	//console.log(file);
+	// throw errors for malformed options
+	if(!_.isNumber(opts.MaxQuestions) || opts.MaxQuestions<1) throw ('"MaxQuestions" must be of type `Number` and greater than `0`');
+	if(!_.isNumber(opts.PassingScore) || opts.PassingScore<0) throw ('"PassingScore" must be of type `Number` and greater than `-1`');
+	if(opts.PassingScore > opts.MaxQuestions) throw ('"PassingScore" can not exceed "MaxQuestions"');
+	if(!opts.Name) throw ('"Name" must be provided');
+	if(!opts.Description) throw ('"Description" must be provided');
+	if(!opts.Questions || !_.isString(opts.Questions)) throw ('You must provide "Questions" in the form of an Excel document');
+	
+	var file = xlsx.readFile(opts.Questions);
 	var sheetName = file.Props.SheetNames[0];
 	var sheetObj = file.Sheets[sheetName];
 	var sheet = xlsx.utils.sheet_to_formulae(sheetObj);
-	var testJSON = ParseXLSX(sheet);
+	
+	this.testJSON = ParseXLSX(sheet, opts);
 
-	console.log(util.inspect(testJSON, false, null));
+	return this;
 
 }
+
+AssessmentGenerator.prototype.launch = function Launch(userOpts){
+	userOpts = _.isPlainObject(userOpts) ? userOpts : {};
+	var opts = _.assign(defaults, userOpts);
+
+	return this;
+};
+
+AssessmentGenerator.prototype.printKey = function PrintKey(){
+	return this;
+};
 
 function ParseXLSX(sheet){
 
 	var out = [];
+	var key = [];
 	var lastQuestion = null;
 
 	sheet.forEach(function BuildOut(line,ind,sheet){
@@ -36,6 +58,11 @@ function ParseXLSX(sheet){
 				"question": content,
 				"answers": []
 			});
+
+			key.push({
+				"id": cell,
+				"answer": null
+			});
 		}
 
 		// this is an answer option
@@ -44,24 +71,22 @@ function ParseXLSX(sheet){
 			currentObj = _.findWhere(out, {"id":lastQuestion});
 			currentObj.answers.push({
 				"id": cell,
-				"answer": content,
-				"correct": false
+				"answer": content
 			});
 		}
 
 		// this is a correct answer
 		if(cell.indexOf('C')===0){
 			if(!lastQuestion) throw ('Excel document does not start with a question!');
-			currentObj = _.findWhere(out, {"id":lastQuestion});
-			correctAns = _.findWhere(currentObj.answers, {"id":cell.replace('C','B')});
-			correctAns.correct = true;
+			currentObj = _.findWhere(key, {"id":lastQuestion});
+			currentObj.answer = cell;
 		}
 
 	});
 
-	return out;
-}
+	// perform transformations on output array
 
-AssessmentGenerator();
+	return {"questions": out, "key": key};
+}
 
 module.exports = AssessmentGenerator;
