@@ -20,5 +20,16 @@
     "browser-sync": "^2.5.2",
     "lodash": "^3.6.0",
     "xlsx": "^0.7.12"
-  }
+  },
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wbell/assessment-generator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wbell/assessment-generator/issues"
+  },
+  "homepage": "https://github.com/wbell/assessment-generator"
 }
