@@ -4,6 +4,7 @@ module.exports = {
 	"PassingScore": 2,
 	"RandomizeQuestions": false,
 	"RandomizeAnswers": false,
+	"BaseDir": "assessment_public",
 
 	// server options
 	"port": 7654
