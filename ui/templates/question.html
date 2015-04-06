@@ -1,7 +1,7 @@
-<h6>{{root.Title}} - Question #{{q.index}}</h6>
-<p>{{q.question}}</p>
+<h6>{{::$root.info.title}} - Question #{{::q.index}}</h6>
+<p>{{::q.question}}</p>
 <ol>
-	<li ng-repeat="ans in q.answers">
+	<li ng-repeat="ans in ::q.answers">
 		<label>
 			<input type="radio" name="{{q.id}}" value="{{ans.id}}" ng-model="selectedAnswer" />
 			<span>{{ans.answer}}</span>

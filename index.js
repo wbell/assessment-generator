@@ -2,28 +2,42 @@ var xlsx = require('xlsx');
 var _ = require('lodash');
 var defaults = require('./lib/defaults');
 var ParseXLSX = require('./lib/parsexlsx');
+var ParseXLSXOpts = require('./lib/parsexlsxopts');
 var log = require('./lib/log');
 var path = require('path');
 var http = require('http');
-var os = require('os');
 var open = require('open');
 var nodeStatic = require('node-static');
 
 // constructor
 function AssessmentGenerator(userOpts) {
   userOpts = _.isPlainObject(userOpts) ? userOpts : {};
-  var opts = this.opts = _.assign(defaults, userOpts);
+  var opts = this.opts = _.assign({},defaults, userOpts);
+
+  // make sure excel sheet is there
+  if (!opts.questions || !_.isString(opts.questions)) throw ('You must provide "questions" in the form of an Excel document');
+
+  // parse file
+  var file = xlsx.readFile(opts.questions);
+
+  // if config sheet is there, parse it for more options
+  if(_.includes(file.Props.SheetNames, opts.configSheetName)){
+    var xlsxConfigSheetObj = file.Sheets[opts.configSheetName];
+    var xlsxConfigSheet = xlsx.utils.sheet_to_formulae(xlsxConfigSheetObj);
+    var xlsxConfigOpts = ParseXLSXOpts(xlsxConfigSheet);
+
+    opts = this.opts = _.assign({}, defaults, xlsxConfigOpts, userOpts);
+  }
 
   // throw errors for malformed options
-  if (!_.isNull(opts.MaxQuestions) && (!_.isNumber(opts.MaxQuestions) || opts.MaxQuestions < 1)) throw ('"MaxQuestions" must be of type `Number` and greater than `0`');
-  if (!_.isNull(opts.PassingScore) && (!_.isNumber(opts.PassingScore) || opts.PassingScore < 0)) throw ('"PassingScore" must be of type `Number` and greater than `-1`');
-  if (!_.isNull(opts.MaxQuestions) && !_.isNull(opts.PassingScore) && (opts.PassingScore > opts.MaxQuestions)) throw ('"PassingScore" can not exceed "MaxQuestions"');
-  if (!opts.Title || !_.isString(opts.Title)) throw ('"Title" must be provided as a `String`');
-  if (!opts.Description) throw ('"Description" must be provided');
-  if (!opts.Questions || !_.isString(opts.Questions)) throw ('You must provide "Questions" in the form of an Excel document');
+  if (!_.isNull(opts.maxQuestions) && (!_.isNumber(opts.maxQuestions) || opts.maxQuestions < 1)) throw ('"maxQuestions" must be of type `Number` and greater than `0`');
+  if (!_.isNull(opts.passingScore) && (!_.isNumber(opts.passingScore) || opts.passingScore < 0)) throw ('"passingScore" must be of type `Number` and greater than `-1`');
+  if (!_.isNull(opts.maxQuestions) && !_.isNull(opts.passingScore) && (opts.passingScore > opts.maxQuestions)) throw ('"passingScore" can not exceed "maxQuestions"');
+  if (!opts.title || !_.isString(opts.title)) throw ('"title" must be provided as a `String`');
+  if (!opts.description) throw ('"description" must be provided');
 
-  var file = xlsx.readFile(opts.Questions);
-  var sheetName = file.Props.SheetNames[0];
+
+  var sheetName = _.without(file.Props.SheetNames, opts.configSheetName)[0];
   var sheetObj = file.Sheets[sheetName];
   var sheet = xlsx.utils.sheet_to_formulae(sheetObj);
 
@@ -40,7 +54,7 @@ AssessmentGenerator.prototype.launch = function Launch(port, launchBrowser) {
   var _this = this;
   var fileServer = new nodeStatic.Server(path.join(__dirname, 'ui'));
 
-  this.opts.Port = (port && _.isNumber(parseInt(port, 10))) ? parseInt(port, 10) : this.opts.Port;
+  this.opts.port = (port && _.isNumber(parseInt(port, 10))) ? parseInt(port, 10) : this.opts.port;
   launchBrowser = !!launchBrowser;
 
   require('http').createServer(function(req, res) {
@@ -53,11 +67,11 @@ AssessmentGenerator.prototype.launch = function Launch(port, launchBrowser) {
     // send general info
     if (req.url.toLowerCase() === '/api/info') {
       var info = {
-        "Title": _this.opts.Title,
-        "Description": _this.opts.Description,
-        "MaxQuestions": _this.opts.MaxQuestions,
-        "PassingScore": _this.opts.PassingScore,
-        "QuestionKey": _.pluck(_this.testJSON.questions, 'id')
+        "title": _this.opts.title,
+        "description": _this.opts.description,
+        "maxQuestions": _this.opts.maxQuestions,
+        "passingScore": _this.opts.passingScore,
+        "questionKey": _.pluck(_this.testJSON.questions, 'id')
       };
 
       res.writeHead(200, {
@@ -67,7 +81,7 @@ AssessmentGenerator.prototype.launch = function Launch(port, launchBrowser) {
     }
 
     // send question info
-    if (req.url.toLowerCase().match('/api/question/[a-z]{1}[0-9]{1,4}')) {
+    if (req.url.toLowerCase().match('/api/question/a[0-9]{1,4}')) {
       var qID = _.last(req.url.split('/'));
       var info = _.find(_this.testJSON.questions, {
         id: qID
@@ -78,13 +92,13 @@ AssessmentGenerator.prototype.launch = function Launch(port, launchBrowser) {
       res.end(JSON.stringify(info));
     }
 
-  }).listen(this.opts.Port);
+  }).listen(this.opts.port);
 
-  log(_this.opts.Title + ' started at http://' + _this.opts.Host + ':' + this.opts.Port);
+  log(this.opts.title + ' started at http://' + this.opts.host + ':' + this.opts.port);
 
   if (launchBrowser) {
     log('Opening browser');
-    open('http://' + _this.opts.Host + ':' + this.opts.Port);
+    open('http://' + this.opts.host + ':' + this.opts.port);
   }
 
   return this;

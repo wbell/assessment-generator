@@ -1,10 +1,10 @@
 var Assessment = require('../');
 
 var ass1 = new Assessment({
-	"Title": "DERP TEST",
-	"Description": "This will test how derpy you are.",
-	"Questions": "questions.xlsx",
-	"MaxQuestions": 3
+	"title": "DERP TEST",
+	"questions": "questions.xlsx",
+	"maxQuestions": 3,
+  "passingScore": 2
 });
 
 ass1.launch(8080, true);
