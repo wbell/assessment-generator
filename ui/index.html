@@ -1,35 +1,20 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="AssessmentApp">
+
 <head>
-	<meta charset="UTF-8">
-	<title>{{root.Title}}</title>
-	<link rel="stylesheet" href="assets/style.css">
+  <meta charset="UTF-8">
+  <title ng-bind="root.Title">Assessment Generator</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
-	<div ui-view></div>
-	
-	<script type="text/ng-template" id="intro.html">
-		<h1>{{root.Title}}</h1>
-		<p>{{root.Description}}</p>
-		<button ng-click="continue()">Continue</button>
-	</script>
 
-	<script type="text/ng-template" id="question.html">
-		<h6>{{root.Title}} - Question #{{q.index}}</h6>
-		<p>{{q.question}}</p>
-		<ol>
-			<li ng-repeat="ans in q.answers">
-				<label>
-					<input type="radio" name="{{q.id}}" value="{{ans.id}}" ng-model="selectedAnswer" />
-					<span>{{ans.answer}}</span>
-				</label>
-			</li>
-		</ol>
-	</script>
+  <div ui-view></div>
 
-	<script src="assets/angular.min.js"></script>
-	<script src="assets/angular-ui-router.min.js"></script>
-	<script src="assets/app.js"></script>
+  <script src="js/angular.min.js"></script>
+  <script src="js/angular-ui-router.min.js"></script>
+  <script src="js/app.js"></script>
 
 </body>
+
 </html>
