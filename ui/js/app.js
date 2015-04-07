@@ -2,11 +2,49 @@
 
   var app = angular.module('AssessmentApp', ['ui.router', 'angular-locker']);
 
-  app.run(['$rootScope', function($rootScope) {
-    console.log('APP LOADED!', $rootScope);
+  // setup
+  app.run(['$rootScope', '$state', '$stateParams', 'user', function($rootScope, $state, $stateParams, user) {
+    console.log('APP LOADED!');
+    // make state & params available to templates
+    $rootScope.$state = $state;
+    $rootScope.$stateParams = $stateParams;
+
+    $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
+
+      // prevent skipping ahead if intro hasn't been seen
+      if(toState.name!=='intro' && !user.get('hasStarted')){
+        event.preventDefault();
+        $state.go('intro');
+      }
+
+      // prevent confirmation if all questions haven't been answered
+      if(toState.name==='confirm' && !user.get('allAnswered')){
+        event.preventDefault();
+        $state.go('question', user.get('lastQuestion'));
+      }
+
+      // prevent grade if no confirmation
+      if(toState.name==='grade' && !user.get('answersConfirmed')){
+        event.preventDefault();
+        $state.go('confirm');
+      }
+    });
+
+    window.addEventListener("beforeunload", function(event) {
+        if($state.is('grade')){
+          console.log("CLEAR");
+          user.clear();
+        } else {
+          console.log("SAVE");
+          user.save();
+        }
+
+    });
+
   }]);
 
-  app.config(function($stateProvider, $urlRouterProvider) {
+  // configure routes
+  app.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
 
     $urlRouterProvider.otherwise('/intro');
 
@@ -54,19 +92,49 @@
 
           }]
         },
-        controller: ['$scope', '$stateParams', 'user', 'question', function($scope, $stateParams, user, question){
+        controller: ['$scope', '$stateParams', 'user', 'api', 'question', function($scope, $stateParams, user, api, question){
           $scope.q = question;
           $scope.q.index = $stateParams.questionNumber;
 
-
+          user.set('lastQuestion', $stateParams.questionNumber);
         }]
-      })
+      });
 
+  }]);
+
+  // configure locker
+  app.config(['lockerProvider', function(lockerProvider){
+    //lockerProvider.setDefaultNamespace('AssessmentApp')
+  }]);
+
+  app.directive('navigator', function(){
+    return {
+      restrict: 'A',
+      templateUrl: 'templates/navigator.html',
+      controller: ['$scope', '$stateParams', '$state', 'api', 'user', function($scope, $stateParams, $state, api, user){
+        $scope.isVisible = function(){
+          return ($state.name === 'question' || $state.name === 'confirm');
+        };
+
+        $scope.questionKey = [];
+
+        api.getInfo().then(function(res){
+          $scope.questionKey = res.data.questionKey;
+        });
+
+        $scope.prev = function(){
+          if($state.name==='question'){
+
+          }
+        }
+
+      }]
+    };
   });
 
-  app.factory('user', function() {
+  app.factory('user', ['locker', function(locker) {
 
-    var userObj = {
+    var userObj = locker.get('user') || {
       firstName: null,
       lastName: null,
       answers: {}
@@ -82,7 +150,11 @@
     }
 
     function get(prop) {
-      return userObj[prop];
+      if(prop){
+        return userObj[prop];
+      } else {
+        return userObj;
+      }
     }
 
     function set(prop, val){
@@ -91,7 +163,11 @@
     }
 
     function saveState(){
+      locker.put(userObj);
+    }
 
+    function clearLocker(){
+      locker.clean();
     }
 
     return {
@@ -99,10 +175,11 @@
       setNames: setNames,
       get: get,
       set: set,
-      save: saveState
+      save: saveState,
+      clear: clearLocker
     };
 
-  });
+  }]);
 
   app.factory('api', ['$rootScope', '$http', 'user', function($rootScope, $http, user) {
 
