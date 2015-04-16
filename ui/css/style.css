@@ -1,3 +1,12 @@
 body {
 	background: goldenrod;
 }
+
+/*navigator directive*/
+.navigator option {
+  color: blue;
+}
+
+.navigator option.answered {
+  color: #ccc;
+}

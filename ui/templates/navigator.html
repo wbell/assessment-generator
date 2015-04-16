@@ -1,6 +1,5 @@
-<div class="navigator" ng-show="isVisible()">
-  <a ng-href class="prev">Previous</a>
-  <a ng-href class="next">Next</a>
-
-  <select></select>
+<div class="navigator" ng-hide="!isVisible()">
+  <button class="prev" ng-click="prev()" ng-disabled="$stateParams.questionNumber=='1'">Previous</button>
+  <select ng-change="navigate()" ng-model="navItem" ng-options="opt.val as opt.label for opt in questionKey"></select>
+  <button class="next" ng-click="next()" ng-disabled="$state.$current.name=='confirm'">Next</button>
 </div>

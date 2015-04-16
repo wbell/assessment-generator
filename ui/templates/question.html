@@ -3,7 +3,7 @@
 <ol>
 	<li ng-repeat="ans in ::q.answers">
 		<label>
-			<input type="radio" name="{{q.id}}" value="{{ans.id}}" ng-model="selectedAnswer" />
+			<input type="radio" name="answer" value="{{ans.id}}" ng-model="q.selectedAnswer" ng-change="setAnswer()" />
 			<span>{{ans.answer}}</span>
 		</label>
 	</li>

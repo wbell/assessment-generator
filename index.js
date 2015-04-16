@@ -3,6 +3,7 @@ var _ = require('lodash');
 var defaults = require('./lib/defaults');
 var ParseXLSX = require('./lib/parsexlsx');
 var ParseXLSXOpts = require('./lib/parsexlsxopts');
+var GradeTest = require('./lib/gradetest');
 var log = require('./lib/log');
 var path = require('path');
 var http = require('http');
@@ -12,7 +13,7 @@ var nodeStatic = require('node-static');
 // constructor
 function AssessmentGenerator(userOpts) {
   userOpts = _.isPlainObject(userOpts) ? userOpts : {};
-  var opts = this.opts = _.assign({},defaults, userOpts);
+  var opts = this.opts = _.assign({}, defaults, userOpts);
 
   // make sure excel sheet is there
   if (!opts.questions || !_.isString(opts.questions)) throw ('You must provide "questions" in the form of an Excel document');
@@ -21,7 +22,7 @@ function AssessmentGenerator(userOpts) {
   var file = xlsx.readFile(opts.questions);
 
   // if config sheet is there, parse it for more options
-  if(_.includes(file.Props.SheetNames, opts.configSheetName)){
+  if (_.includes(file.Props.SheetNames, opts.configSheetName)) {
     var xlsxConfigSheetObj = file.Sheets[opts.configSheetName];
     var xlsxConfigSheet = xlsx.utils.sheet_to_formulae(xlsxConfigSheetObj);
     var xlsxConfigOpts = ParseXLSXOpts(xlsxConfigSheet);
@@ -37,8 +38,9 @@ function AssessmentGenerator(userOpts) {
   if (!opts.description) throw ('"description" must be provided');
 
 
-  var sheetName = _.without(file.Props.SheetNames, opts.configSheetName)[0];
+  var sheetName = opts.questionsSheetName || _.without(file.Props.SheetNames, opts.configSheetName)[0];
   var sheetObj = file.Sheets[sheetName];
+  if (!sheetObj) throw ('"' + sheetNAme + '" sheet not found.');
   var sheet = xlsx.utils.sheet_to_formulae(sheetObj);
 
   // create test JSON
@@ -67,6 +69,7 @@ AssessmentGenerator.prototype.launch = function Launch(port, launchBrowser) {
     // send general info
     if (req.url.toLowerCase() === '/api/info') {
       var info = {
+        "id": _this.opts.id || _this.opts.title.replace(/\W/g, ''),
         "title": _this.opts.title,
         "description": _this.opts.description,
         "maxQuestions": _this.opts.maxQuestions,
@@ -90,6 +93,30 @@ AssessmentGenerator.prototype.launch = function Launch(port, launchBrowser) {
         "Content-Type": "application/json"
       });
       res.end(JSON.stringify(info));
+    }
+
+    // send grade info
+    if (req.url.toLowerCase() === '/api/grade' && req.method === 'POST') {
+      var postData = '';
+
+      req.on('data', function(chunk) {
+        postData += chunk.toString();
+      });
+
+      req.on('end', function() {
+        var result = GradeTest(JSON.parse(postData), _this.testJSON, _this.opts.passingScore);
+        res.writeHead(200, {
+          "Content-Type": "application/json"
+        });
+        res.end(JSON.stringify(result));
+
+        if(result.score.pass){
+          log('Congrats! You passed!');
+        } else {
+          log('Aw, you failed. You dumb.');
+        }
+
+      });
     }
 
   }).listen(this.opts.port);
