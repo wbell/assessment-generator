@@ -1,0 +1,3 @@
+<p ng-show="allAnswered">Take this opportunity to double check your answers, or continue to grading.</p>
+<p ng-show="!allAnswered">Please answer every question before continuing.</p>
+<button ng-click="grade()" ng-disabled="!allAnswered">Grade Now</button>

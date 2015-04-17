@@ -1,0 +1,40 @@
+<div ng-show="score.pass">
+  <h1>You passed!</h1>
+  <p>Congratulations, you passed the <strong>{{::info.title}}</strong> assessment.</p>
+</div>
+
+<div ng-hide="score.pass">
+  <h1>You failed</h1>
+  <p>Sorry, you didn't score high enough to pass the <strong>{{::info.title}}</strong> assessment.</p>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>&nbsp;</th>
+      <th>Amount Correct</th>
+      <th>Percentage Correct</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="user" ng-class="{'pass': score.pass}">
+      <th>Your Score:</th>
+      <td>{{::score.number}}</td>
+      <td>{{::score.percent}}%</td>
+    </tr>
+    <tr>
+      <th>Passing Score:</th>
+      <td>{{::info.passingScore}}</td>
+      <td>{{::getPct()}}%</td>
+    </tr>
+  </tbody>
+</table>
+
+<div ng-repeat="q in key">
+  <p>{{::q.question}}</p>
+  <ol>
+    <li ng-repeat="ans in ::q.answers">
+      <span ng-class="{'your-answer': ans.chosen, 'correct-answer': ans.correct}">{{ans.answer}}</span>
+    </li>
+  </ol>
+</div>
