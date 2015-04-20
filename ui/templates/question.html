@@ -1,10 +1,12 @@
-<h6>{{::$root.info.title}} - Question #{{::q.index}}</h6>
-<p>{{::q.question}}</p>
-<ol>
-	<li ng-repeat="ans in ::q.answers">
-		<label>
-			<input type="radio" name="answer" value="{{ans.id}}" ng-model="q.selectedAnswer" ng-change="setAnswer()" />
-			<span>{{ans.answer}}</span>
-		</label>
-	</li>
-</ol>
+<h4>{{::$root.info.title}} - Question #{{::q.index}}</h4>
+<div class="question">
+  <p>{{::q.question}}</p>
+  <ol>
+    <li ng-repeat="ans in ::q.answers">
+      <label>
+        <input type="radio" name="answer" value="{{ans.id}}" ng-model="q.selectedAnswer" ng-change="setAnswer()" />
+        <span>{{ans.answer}}</span>
+      </label>
+    </li>
+  </ol>
+</div>

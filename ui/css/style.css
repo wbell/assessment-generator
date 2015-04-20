@@ -1,12 +1,95 @@
 body {
-	background: goldenrod;
+	background: #525252;
+  color: #fff;
+  font-family: arial, helvetica, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #e13f3f;
+}
+
+/*question*/
+.question {
+  margin-bottom: 2em;
+}
+
+.question label {
+  display: inline-block;
+}
+
+.question p {
+  font-size: 1.2em;
+}
+
+.question ol {
+  list-style-type: upper-alpha;
+  color: #e13f3f;
+}
+
+.question li {
+  margin: 0.5em 0;
+}
+
+.question li span {
+  color: #fff;
+}
+
+.answers .question li span {
+  opacity: 0.5;
+}
+
+.answers .question li span.correct-answer {
+  opacity: 1;
+  font-weight: bold;
+}
+
+.answers .question li span.your-answer {
+  display: inline-block;
+  padding-right: 20px;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACTklEQVQ4T5WTT0/UQBjGn+m07LbddvkTEpE14JmeTQwHgzHxYOJBT5zgxNmEL4BHTxwMF76BXDx5RWJiPBiCJAteSASkuy0EaHe727/TMVPc1RU8MEkPM53fb955n5bgloMvLWlkfb3bw8jfPF9enkIuV8jqm72bvPHCwgxP2ROeJTvqxsYnsacvKGA6dMg5B8lii6yuDkgKmMh1UhpC4p6+Q5q/Nj68/14IejBKJXAxb7eRpZFVWlsrJAXMpTo1DcjVKuKfJwib7qvh2QdvrwQrK2XutTtQVYkYBvJWC7nnIQ8TC0kCLpO6ZBpQzCoi+wRx02HVizOVbG+nf66wuFJm2nlAVJVKZhXM95BdXoCnGahhQKmaiE5sRI7DvCyu3N/aigZ6UFSyuFhOJCWQNI3KI8MAy4FcPAyRLWCXeSzpw9cEPUkYZx11alrC8RHAGFCbhLfzLffyVO+dfGOMYrE9Pz8jE1ovT9aAw8OrCmqT8Pf3wbzAGvv6eSCdge9AwBRSXdZ0KKYB5LwoX0gi10XoOIjbvjWxu9uX9AUFzMlv2ETYbAiI5WlKyiOjkn73DrpNB91GA5nfsSYO9gtJIWi/nJ+hsoA1KGYFYcNBdOoyn/CKeK/5QaCOjVLjXg2dRhMd0dBW15o6Pti7Ejx/MSeVlE1F15EFHYSnLmtJ6Hf7x/R0uaTqgT4+TsWewLaRnF8+rtlHH/tXuHz6bI7KdDNt+XmLkmvdFhKF0GDIMGgPvhbj2eyjuUAhX/6NqhdZIUnThzXb/vjfGG/5d+MXQU8vIfcWoh0AAAAASUVORK5CYII=);
+  background-position: center right;
+  background-repeat: no-repeat;
+}
+
+.answers .question li span.your-answer.correct-answer {
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAB2UlEQVQ4T6WTzUvbcBjHv22stbHimpjMl2LT+Sd43W2wQ7GHofM4D8IODoqiJ/FQT56Dp1EsInjRy2AXcZfuD9hhl6W1SU06Jsqwo2pqm/ySnyRgEazO4nN84PN5XnieAJ4ZgWfy6Fowu5OWLduufZk/WPeKdyWY2Z6ShzkxQwiBbhirB0vfN54smMlPyS95ITMhSWhcN1HWNBxXqmtPEkznU7IY8+AkXLj4pZRwXDEQIH2RtuDT4dwbi5BXudRu7u5ip7dSshAbyiQlCRQUilKCpupOD2WjhWyh6QsWvn14bVvOHs/GRk7+ni3uzO7LXv7dVkoWX/CZpJSAC4qicuTDIfT7sL/EhcO5t7Zl5SUhMRYOhfFD+ekQQpZJi8QFjl9JeJWpg2KxjIpmOL2ItmFfsLT3PlIPMQ1+gMOoOALzuoE/pydgggxEUQANAkdKGRXVcMPBgf7byrdj+iN8/JpmLy8Ykx/kEB8dg+s6sFwboECpqEJXqzTMnLOFrO63fTfaS0x/TrMMbJPnOIwn4iCug7KiQdeqtK+n1hG+d0iepHV1YQrCEGxiw9B+00jo34Nwx0uczE6ykSBjWk2L1C6vouqm2nrsXzoekiepn9ed/8Fd/0KnTm4AbafUjeJUQC8AAAAASUVORK5CYII=);
 }
 
 /*navigator directive*/
+.navigator {
+  margin-top: 2em;
+}
+
 .navigator option {
-  color: blue;
+  color: #e13f3f;
 }
 
 .navigator option.answered {
   color: #ccc;
+}
+
+/*grade table*/
+table {
+  margin: 2em 0;
+  text-align: center;
+}
+
+table th {
+  color: #ccc;
+}
+
+table tbody th {
+  text-align: right;
+}
+
+table th, table td {
+  padding: 0.3em;
+}
+
+table tr.user td {
+  color: red;
+}
+
+table tr.user.pass td {
+  color: lightgreen;
 }

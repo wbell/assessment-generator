@@ -54,11 +54,13 @@
     });
 
     window.addEventListener('beforeunload', function(event) {
-      if ($state.current.name === 'grade') {
-        user.clear();
-      } else {
-        user.save();
-      }
+      // if ($state.current.name === 'grade') {
+      //   user.clear();
+      // } else {
+      //   //user.save();
+      // }
+
+      user.save();
     });
 
   }]);
@@ -194,6 +196,8 @@
           var answeredQuestions = ans || user.get('answers');
           var opts = document.getElementsByTagName('option');
 
+          angular.element(opts).removeClass('answered');
+
           angular.forEach(answeredQuestions, function(ans, que) {
             var ind = $scope.keys.indexOf(que);
             if (opts[ind]) angular.element(opts[ind]).addClass('answered');
@@ -275,13 +279,20 @@
 
     var userObj = {};
 
-    function setObject(id) {
-      userObj = locker.namespace(id).get('user') || {
-        id: id,
-        firstName: null,
-        lastName: null,
-        answers: {}
-      };
+    function setObject(id, currentSession) {
+      userObj = locker.namespace(id).get('user') || {};
+
+      if(!userObj.session || userObj.session != currentSession){
+
+        userObj = {
+          id: id,
+          session: currentSession,
+          firstName: null,
+          lastName: null,
+          answers: {}
+        };
+
+      }
 
       return get();
     }
@@ -333,6 +344,7 @@
 
     function clearLocker() {
       locker.namespace(userObj.id).clean();
+      setObject(userObj.id, userObj.session);
     }
 
     return {
@@ -349,8 +361,9 @@
 
   app.factory('api', ['$rootScope', '$http', 'user', function($rootScope, $http, user) {
 
-    getInfo('id').then(function(id) {
-      user.setObject(id);
+    getInfo().then(function(res) {
+      var info = res.data;
+      user.setObject(info.id, info.session);
     });
 
     function getInfo(prop) {

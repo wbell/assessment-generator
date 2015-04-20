@@ -55,6 +55,7 @@ AssessmentGenerator.prototype.launch = function Launch(port, launchBrowser) {
 
   var _this = this;
   var fileServer = new nodeStatic.Server(path.join(__dirname, 'ui'));
+  var session = Date.parse(new Date());
 
   this.opts.port = (port && _.isNumber(parseInt(port, 10))) ? parseInt(port, 10) : this.opts.port;
   launchBrowser = !!launchBrowser;
@@ -70,6 +71,7 @@ AssessmentGenerator.prototype.launch = function Launch(port, launchBrowser) {
     if (req.url.toLowerCase() === '/api/info') {
       var info = {
         "id": _this.opts.id || _this.opts.title.replace(/\W/g, ''),
+        "session": session,
         "title": _this.opts.title,
         "description": _this.opts.description,
         "maxQuestions": _this.opts.maxQuestions,
@@ -111,7 +113,8 @@ AssessmentGenerator.prototype.launch = function Launch(port, launchBrowser) {
         res.end(JSON.stringify(result));
 
         if(result.score.pass){
-          log('Congrats! You passed!');
+          var dateStamp = new Date().toISOString();
+          log('Congrats! You passed! '+dateStamp);
         } else {
           log('Aw, you failed. You dumb.');
         }

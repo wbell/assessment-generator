@@ -7,4 +7,4 @@ var ass1 = new Assessment({
   "passingScore": 2
 });
 
-ass1.launch(8080);
+ass1.launch(8080, true);

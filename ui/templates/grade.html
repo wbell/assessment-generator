@@ -30,11 +30,20 @@
   </tbody>
 </table>
 
-<div ng-repeat="q in key">
-  <p>{{::q.question}}</p>
-  <ol>
-    <li ng-repeat="ans in ::q.answers">
-      <span ng-class="{'your-answer': ans.chosen, 'correct-answer': ans.correct}">{{ans.answer}}</span>
-    </li>
-  </ol>
+<button ng-click="restart()">Restart Test</button> &nbsp;
+<button ng-show="key" ng-click="showAnswers=true" ng-disabled="showAnswers">Reveal Answers</button>
+
+<div class="answers" ng-if="showAnswers">
+
+  <h3>Answer Key</h3>
+
+  <div ng-repeat="q in key" class="question">
+    <p>{{$index+1}}.) {{::q.question}}</p>
+    <ol>
+      <li ng-repeat="ans in ::q.answers">
+        <span ng-class="{'your-answer': ans.chosen, 'correct-answer': ans.correct}" title="{{{true: 'Your Answer'}[ans.chosen]}}">{{ans.answer}}</span>
+      </li>
+    </ol>
+  </div>
+
 </div>
